@@ -46,7 +46,9 @@ def validar_ticker(ticker):
 
 def descargar_datos_empresa(ticker, fecha_inicio, fecha_fin):
     """
-    Descarga datos históricos para un ticker específico.
+    Descarga datos históricos para un ticker específico y ajusta el formato
+    de las columnas para que sea compatible con el encabezado requerido:
+    Date,Close,High,Low,Open,Volume
 
     Args:
         ticker (str): Símbolo del ticker.
@@ -54,7 +56,7 @@ def descargar_datos_empresa(ticker, fecha_inicio, fecha_fin):
         fecha_fin (str): Fecha de fin (YYYY-MM-DD).
 
     Returns:
-        pd.DataFrame: DataFrame con los datos históricos, o None si falla.
+        pd.DataFrame: DataFrame con los datos históricos formateados, o None si falla.
     """
     try:
         if not validar_ticker(ticker):
@@ -64,7 +66,16 @@ def descargar_datos_empresa(ticker, fecha_inicio, fecha_fin):
         if data.empty:
             print(f"No se descargaron datos para {ticker} en el período {fecha_inicio} - {fecha_fin}.")
             return None
+            
         print(f"Datos descargados para {ticker} desde {fecha_inicio} hasta {fecha_fin}")
+        
+        # Ajustar estructura del DataFrame para que cumpla con el formato requerido
+        # Por defecto yfinance devuelve datos con columnas: Open, High, Low, Close, Adj Close, Volume
+        # Ya no necesitamos la columna Price, usaremos directamente Close, High, Low, Open, Volume
+        
+        # Reordenar y seleccionar las columnas en el orden deseado
+        data = data[['Close', 'High', 'Low', 'Open', 'Volume']]
+        
         return data
     except Exception as e:
         print(f"Error al descargar datos para {ticker}: {e}")
@@ -130,7 +141,19 @@ if __name__ == '__main__':
                         
                     nombre_archivo = f"{ticker_symbol}_datos_historicos.csv"
                     ruta_completa_archivo = os.path.join(ruta_guardado_abs, nombre_archivo)
-                    datos.to_csv(ruta_completa_archivo)
+                    
+                    # Convertir el índice (fechas) en una columna y añadir el ticker como identificador
+                    datos_con_fecha = datos.reset_index()
+                    datos_con_fecha['Ticker'] = ticker_symbol
+                    
+                    # Asegurarse de que las columnas tengan los nombres correctos
+                    datos_con_fecha.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume', 'Ticker']
+                    
+                    # Reordenar para tener Date, Ticker y luego los datos
+                    datos_con_fecha = datos_con_fecha[['Date', 'Ticker', 'Close', 'High', 'Low', 'Open', 'Volume']]
+                    
+                    # Guardar en CSV sin índice numérico y con formato de fecha adecuado
+                    datos_con_fecha.to_csv(ruta_completa_archivo, index=False, date_format='%Y-%m-%d')
                     print(f"Datos de {nombre_empresa} guardados en: {ruta_completa_archivo}")
                 else:
                     print(f"No se pudieron descargar o no hay datos para {nombre_empresa}.")
