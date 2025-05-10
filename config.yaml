@@ -1,0 +1,59 @@
+\
+# Configuración del Proyecto de Análisis y Optimización de Inversiones
+
+# Información de Empresas
+empresas:
+  tecnologia:
+    - ticker: MSFT
+      nombre: Microsoft
+    - ticker: GOOG
+      nombre: Alphabet
+    - ticker: META
+      nombre: Meta Platforms
+    - ticker: AMZN
+      nombre: Amazon
+    - ticker: NVDA
+      nombre: NVIDIA
+  salud_farmaceuticas:
+    - ticker: JNJ
+      nombre: Johnson & Johnson
+    - ticker: MRK
+      nombre: Merck & Co.
+    - ticker: PFE
+      nombre: Pfizer
+    - ticker: BMY
+      nombre: Bristol Myers Squibb
+    - ticker: LLY
+      nombre: Eli Lilly
+
+# Periodo de Análisis
+periodo_analisis:
+  fecha_inicio: "2022-05-09"  # Últimos 3 años desde la fecha actual (9 de mayo de 2025)
+  fecha_fin: "2025-05-09"
+
+# Parámetros de Modelado
+modelado:
+  ventana_temporal_retornos_pasados: [1, 2, 3, 4, 5] # Lags para retornos pasados
+  ventana_media_movil_volumen: 7 # Días para promedio móvil de volumen
+  split_ratio: 0.8 # Proporción para datos de entrenamiento (80%)
+
+# Parámetros de Optimización de Cartera
+optimizacion:
+  presupuesto_total: 100000 # Ejemplo de presupuesto
+  diversificacion_minima_sector: # Porcentajes mínimos por sector
+    tecnologia: 0.30
+    salud_farmaceuticas: 0.30
+  lambda_riesgo: 0.5 # Coeficiente de aversión al riesgo (ejemplo para Markowitz)
+
+# Rutas de Carpetas (relativas a la raíz del proyecto)
+rutas:
+  datos_crudos: "data/raw/"
+  datos_procesados: "data/processed/"
+  modelos_entrenados: "models/"
+  informes_graficos: "reports/"
+  notebooks: "notebooks/"
+  fuentes: "src/"
+
+# Otros parámetros
+api_extraccion: "yfinance"
+columnas_datos: ["Fecha", "Empresa", "Sector", "Precio_Cierre", "Volumen"]
